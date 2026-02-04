@@ -1,4 +1,4 @@
-// 确保能构建成功的极简版本
+// 修复版 - 确保能构建成功
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -11,15 +11,14 @@ export default function App() {
     const newCount = count + 1;
     setCount(newCount);
     
-    // 功德文字
     const messages = [
       '功德+1', '烦恼-1', '南无阿弥陀佛',
-      '智慧+1', '清心明性', '普度众生'
+      '智慧+1', '清心明性', '普度众生',
+      '财运+1', '招财进宝', '金玉满堂'
     ];
     const randomIndex = Math.floor(Math.random() * messages.length);
     setMessage(messages[randomIndex]);
     
-    // 1秒后恢复
     setTimeout(() => {
       setMessage('点击积德');
     }, 1000);
