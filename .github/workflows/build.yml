@@ -1,0 +1,73 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'APK版本号'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+      
+    - name: 设置Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: 设置Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        
+    - name: 设置Android SDK
+      uses: android-actions/setup-android@v2
+      
+    - name: 安装依赖
+      run: |
+        npm install
+        npm install -g react-native-cli
+        
+    - name: 初始化React Native项目
+      run: |
+        # 创建React Native项目结构
+        npx react-native init SoulTapBuild --version 0.72.6 --npm
+        cd SoulTapBuild
+        
+        # 复制应用代码
+        cp ../App.js App.js
+        cp ../package.json package.json
+        cp ../app.json app.json
+        
+        # 安装项目依赖
+        npm install
+        
+    - name: 构建Android APK
+      run: |
+        cd SoulTapBuild/android
+        chmod +x gradlew
+        ./gradlew assembleRelease
+        
+    - name: 上传APK文件
+      uses: actions/upload-artifact@v3
+      with:
+        name: soultap-apk
+        path: SoulTapBuild/android/app/build/outputs/apk/release/app-release.apk
+        retention-days: 7
+        
+    - name: 显示构建信息
+      run: |
+        echo "✅ APK构建完成！"
+        echo "📱 应用名称: 灵境敲击"
+        echo "📦 版本: ${{ github.event.inputs.version || '1.0.0' }}"
+        echo "📥 在Artifacts中下载APK"
